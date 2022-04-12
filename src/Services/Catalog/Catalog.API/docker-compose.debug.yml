@@ -3,14 +3,30 @@
 version: '3.4'
 
 services:
+  catalogdb:
+    image: mongo
+    container_name: catalogdb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mogno_data:/data/db
+
   catalogapi:
     image: catalogapi
     build:
       context: .
       dockerfile: ./Dockerfile
     ports:
-      - 5088:5088
+      - 8000:80
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - "DatabaseSettings:ConnectionString=mongodb://catalogdb:27017"
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
+    depends_on:
+      - catalogdb
+
+
+volumes:
+  mogno_data:
