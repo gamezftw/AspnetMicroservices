@@ -4,9 +4,9 @@ namespace Discount.Grpc.Extensions
 {
     public static class HostExtensions
     {
-        public static IHost MigrateDatabase<TContext>(this IHost host, int? retry = 0)
+        public static IHost MigrateDatabase<TContext>(this IHost host, int retry = 0)
         {
-            int retryForAvailability = retry.Value;
+            int retryForAvailability = retry;
 
             using (var scope = host.Services.CreateScope())
             {
