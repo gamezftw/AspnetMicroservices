@@ -44,9 +44,9 @@ services:
     volumes:
       - pgadmin_data:/root/.pgadmin
 
-  catalogapi:
-    container_name: catalogapi
-    image: catalogapi
+  catalog.api:
+    container_name: catalog.api
+    image: catalog.api
     build:
       context: .
       dockerfile: src/Services/Catalog/Catalog.API/Dockerfile
@@ -60,25 +60,26 @@ services:
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
 
-  basketapi:
-    container_name: basketapi
-    image: basketapi
+  basket.api:
+    container_name: basket.api
+    image: basket.api
     build:
       context: .
       dockerfile: src/Services/Basket/Basket.API/Dockerfile
     ports:
       - 8001:80
     environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "GrpcSettings:DiscountUrl=http://discount.grpc"
       - "cachesettings:connectionstring=basketdb:6379"
-      - aspnetcore_environment=development
     depends_on:
       - basketdb
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
 
-  discountapi:
-    container_name: discountapi
-    image: discountapi
+  discount.api:
+    container_name: discount.api
+    image: discount.api
     build:
       context: .
       dockerfile: src/Services/Discount/Discount.API/Dockerfile
@@ -86,9 +87,25 @@ services:
       - 8002:80
     environment:
       - "DatabaseSettings:connectionstring=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
-      - aspnetcore_environment=development
+      - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
-      - basketdb
+      - discountdb
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
+
+  discount.grpc:
+    container_name: discount.grpc
+    image: discount.grpc
+    build:
+      context: .
+      dockerfile: src/Services/Discount/Discount.Grpc/Dockerfile
+    ports:
+      - 8003:80
+    environment:
+      - "DatabaseSettings:connectionstring=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - discountdb
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
 
