@@ -10,19 +10,7 @@ namespace Basket.API.Entities
             UserName = username;
         }
 
-        public decimal TotalPrice
-        {
-            get
-            {
-                decimal TotalPrice = 0;
-                foreach (var item in Items)
-                {
-                    TotalPrice += item.Price * item.Quantity;
-                }
-                return TotalPrice;
-            }
-        }
-        public decimal CoolTotalPrice =>
+        public decimal TotalPrice =>
             Items.Aggregate(default(decimal), (acc, curr) => acc + curr.Price * curr.Quantity);
     }
 
