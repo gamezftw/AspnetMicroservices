@@ -140,10 +140,12 @@ services:
     ports:
       - 8004:80
     environment:
-      - "ConnectionStrings:OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=SwN12345678"
       - ASPNETCORE_ENVIRONMENT=Development
+      - "ConnectionStrings:OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=SwN12345678"
+      - EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672
     depends_on:
       - orderdb
+      - rabbitmq
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
 
