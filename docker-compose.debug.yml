@@ -73,7 +73,7 @@ services:
     ports:
       - 8000:80
     environment:
-      - "DatabaseSettings:ConnectionString=mongodb://catalogdb:27018"
+      - "DatabaseSettings:ConnectionString=mongodb://catalogdb:27017"
       - ASPNETCORE_ENVIRONMENT=Development
     depends_on:
       - catalogdb
@@ -146,6 +146,24 @@ services:
     depends_on:
       - orderdb
       - rabbitmq
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
+
+  ocelotapigw:
+    container_name: ocelotapigw
+    image: ocelotapigw
+    build:
+      context: .
+      dockerfile: src/ApiGateways/OcelotApiGw/Dockerfile
+    ports:
+      - 8010:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - catalog.api
+      - basket.api
+      - discount.api
+      - ordering.api
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
 
