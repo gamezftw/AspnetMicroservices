@@ -16,7 +16,7 @@ builder.Services.AddHttpClient<IBasketService, BasketService>(c =>
     c.BaseAddress = new Uri(builder.Configuration["ApiSettings:BasketUrl"]));
 
 builder.Services.AddHttpClient<IOrderService, OrderService>(c =>
-    c.BaseAddress = new Uri(builder.Configuration["ApiSettings:OrderUrl"]));
+    c.BaseAddress = new Uri(builder.Configuration["ApiSettings:OrderingUrl"]));
 
 var app = builder.Build();
 

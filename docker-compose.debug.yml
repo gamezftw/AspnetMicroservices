@@ -167,6 +167,26 @@ services:
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
 
+  shopping.aggregator:
+    container_name: shopping.aggregator
+    image: shopping.aggregator
+    build:
+      context: .
+      dockerfile: src/ApiGateways/Shopping.Aggregator/Dockerfile
+    ports:
+      - 8005:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ApiSettings:CatalogUrl=http://catalog.api
+      - ApiSettings:BasketUrl=http://basket.api
+      - ApiSettings:OrderingUrl=http://ordering.api
+    depends_on:
+      - catalog.api
+      - basket.api
+      - ordering.api
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
+
 volumes:
   mongo_data:
   postgres_data:
