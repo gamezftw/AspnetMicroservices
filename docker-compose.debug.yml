@@ -187,6 +187,26 @@ services:
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
 
+  aspnetrunbasics:
+    container_name: aspnetrunbasics
+    image: aspnetrunbasics
+    build:
+      context: .
+      dockerfile: src/WebApps/AspnetRunBasics/Dockerfile
+    ports:
+      - 8006:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ApiSettings:GatewayUrl=http://ocelotapigw
+    depends_on:
+      - ocelotapigw
+      - catalog.api
+      - basket.api
+      - discount.api
+      - ordering.api
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
+
 volumes:
   mongo_data:
   postgres_data:

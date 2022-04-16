@@ -46,5 +46,22 @@ services:
     depends_on:
       - basketdb
 
+  aspnetrunbasics:
+    container_name: aspnetrunbasics
+    image: aspnetrunbasics
+    build:
+      context: .
+      dockerfile: src/WebApps/AspnetRunBasics/Dockerfile
+    ports:
+      - 8001:80
+    environment:
+      - "CacheSettings:ConnectionString=basketdb:6379"
+    depends_on:
+      - ocelotapigw
+      - catalog.api
+      - basket.api
+      - discount.api
+      - ordering.api
+
 volumes:
   mogno_data:
