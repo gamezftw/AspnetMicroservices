@@ -11,14 +11,18 @@ namespace AspnetRunBasics.Services
     public class CatalogService : ICatalogService
     {
         private readonly HttpClient _client;
+        private readonly ILogger<CatalogService> _logger;
 
         public CatalogService(HttpClient client, ILogger<CatalogService> logger)
         {
-            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _client = client;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<CatalogModel>> GetCatalog()
         {
+            _logger.LogInformation("Getting Catalog Products from url: {url} nad custom property : {customProperty}", _client.BaseAddress, 6);
+
             var response = await _client.GetAsync("/Catalog");
             return await response.ReadContentAs<List<CatalogModel>>();
         }

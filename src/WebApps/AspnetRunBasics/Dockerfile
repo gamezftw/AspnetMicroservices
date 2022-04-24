@@ -1,10 +1,10 @@
-FROM mcr.microsoft.com/dotnet/aspnet:5.0-focal AS base
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-focal AS base
 WORKDIR /app
 EXPOSE 80
 
 ENV ASPNETCORE_URLS=http://+:80
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-focal AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
 WORKDIR /src
 COPY ["src/WebApps/AspnetRunBasics/AspnetRunBasics.csproj", "src/WebApps/AspnetRunBasics/"]
 RUN dotnet restore "src/WebApps/AspnetRunBasics/AspnetRunBasics.csproj"

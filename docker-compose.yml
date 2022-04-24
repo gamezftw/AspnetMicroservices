@@ -75,8 +75,13 @@ services:
     environment:
       - "DatabaseSettings:ConnectionString=mongodb://catalogdb:27017"
       - ASPNETCORE_ENVIRONMENT=Development
+      - Serilog:MinimumLevel:Default=Information
+      - Serilog:MinimumLevel:Default:Override:Microsoft=Information
+      - Serilog:MinimumLevel:Default:Override:System=Information
+      - ElasticsearchConfiguration:Uri=http://elasticsearch:9200
     depends_on:
       - catalogdb
+      - elasticsearch
 
   basket.api:
     container_name: basket.api
@@ -91,9 +96,14 @@ services:
       - "GrpcSettings:DiscountUrl=http://discount.grpc"
       - "CacheSettings:ConnectionString=basketdb:6379"
       - EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672
+      - Serilog:MinimumLevel:Default=Information
+      - Serilog:MinimumLevel:Default:Override:Microsoft=Information
+      - Serilog:MinimumLevel:Default:Override:System=Information
+      - ElasticsearchConfiguration:Uri=http://elasticsearch:9200
     depends_on:
       - basketdb
       - rabbitmq
+      - elasticsearch
 
   discount.api:
     container_name: discount.api
@@ -106,8 +116,13 @@ services:
     environment:
       - "DatabaseSettings:connectionstring=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
       - ASPNETCORE_ENVIRONMENT=Development
+      - Serilog:MinimumLevel:Default=Information
+      - Serilog:MinimumLevel:Default:Override:Microsoft=Information
+      - Serilog:MinimumLevel:Default:Override:System=Information
+      - ElasticsearchConfiguration:Uri=http://elasticsearch:9200
     depends_on:
       - discountdb
+      - elasticsearch
 
   discount.grpc:
     container_name: discount.grpc
@@ -120,8 +135,13 @@ services:
     environment:
       - "DatabaseSettings:connectionstring=Server=discountdb;Port=5432;Database=DiscountDb;User Id=admin;Password=admin1234;"
       - ASPNETCORE_ENVIRONMENT=Development
+      - Serilog:MinimumLevel:Default=Information
+      - Serilog:MinimumLevel:Default:Override:Microsoft=Information
+      - Serilog:MinimumLevel:Default:Override:System=Information
+      - ElasticsearchConfiguration:Uri=http://elasticsearch:9200
     depends_on:
       - discountdb
+      - elasticsearch
 
   ordering.api:
     container_name: ordering.api
@@ -135,9 +155,14 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - "ConnectionStrings:OrderingConnectionString=Server=orderdb;Database=OrderDb;User Id=sa;Password=SwN12345678"
       - EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672
+      - Serilog:MinimumLevel:Default=Information
+      - Serilog:MinimumLevel:Default:Override:Microsoft=Information
+      - Serilog:MinimumLevel:Default:Override:System=Information
+      - ElasticsearchConfiguration:Uri=http://elasticsearch:9200
     depends_on:
       - orderdb
       - rabbitmq
+      - elasticsearch
 
   ocelotapigw:
     container_name: ocelotapigw
@@ -149,11 +174,16 @@ services:
       - 8010:80
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      - Serilog:MinimumLevel:Default=Information
+      - Serilog:MinimumLevel:Default:Override:Microsoft=Information
+      - Serilog:MinimumLevel:Default:Override:System=Information
+      - ElasticsearchConfiguration:Uri=http://elasticsearch:9200
     depends_on:
       - catalog.api
       - basket.api
       - discount.api
       - ordering.api
+      - elasticsearch
 
   shopping.aggregator:
     container_name: shopping.aggregator
@@ -168,10 +198,15 @@ services:
       - ApiSettings:CatalogUrl=http://catalog.api
       - ApiSettings:BasketUrl=http://basket.api
       - ApiSettings:OrderingUrl=http://ordering.api
+      - Serilog:MinimumLevel:Default=Information
+      - Serilog:MinimumLevel:Default:Override:Microsoft=Information
+      - Serilog:MinimumLevel:Default:Override:System=Information
+      - ElasticsearchConfiguration:Uri=http://elasticsearch:9200
     depends_on:
       - catalog.api
       - basket.api
       - ordering.api
+      - elasticsearch
 
   aspnetrunbasics:
     container_name: aspnetrunbasics
@@ -184,14 +219,43 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ApiSettings:GatewayUrl=http://ocelotapigw
+      - Serilog:MinimumLevel:Default=Information
+      - Serilog:MinimumLevel:Default:Override:Microsoft=Information
+      - Serilog:MinimumLevel:Default:Override:System=Information
+      - ElasticsearchConfiguration:Uri=http://elasticsearch:9200
     depends_on:
       - ocelotapigw
       - catalog.api
       - basket.api
       - discount.api
       - ordering.api
+      - elasticsearch
+
+  elasticsearch:
+   container_name: elasticsearch
+   image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+   ports:
+    - 9200:9200
+   volumes:
+    - elasticsearch-data:/usr/share/elasticsearch/data
+   environment:
+    - xpack.monitoring.enabled=true
+    - xpack.watcher.enabled=false
+    - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    - discovery.type=single-node
+
+  kibana:
+   container_name: kibana
+   image: docker.elastic.co/kibana/kibana:7.9.2
+   ports:
+    - 5601:5601
+   depends_on:
+    - elasticsearch
+   environment:
+    - ELASTICSEARCH_URL=http://elasticsearch:9200
 
 volumes:
   mongo_data:
   postgres_data:
   pgadmin_data:
+  elasticsearch-data:
