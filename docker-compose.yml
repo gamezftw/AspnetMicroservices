@@ -231,6 +231,29 @@ services:
       - ordering.api
       - elasticsearch
 
+  webstatus:
+    container_name: webstatus
+    image: webstatus
+    build:
+      context: .
+      dockerfile: src/WebApps/WebStatus/Dockerfile
+    ports:
+      - 8007:80
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - HealthChecks-UI:HealthChecks:0:Name=Catalog Health Check
+      - HealthChecks-UI:HealthChecks:0:Uri=http://catalog.api/hc
+      - HealthChecks-UI:HealthChecks:1:Name=Basket Health Check
+      - HealthChecks-UI:HealthChecks:1:Uri=http://basket.api/hc
+      - HealthChecks-UI:HealthChecks:2:Name=Discount Health Check
+      - HealthChecks-UI:HealthChecks:2:Uri=http://discount.api/hc
+      - HealthChecks-UI:HealthChecks:3:Name=Ordering Health Check
+      - HealthChecks-UI:HealthChecks:3:Uri=http://ordering.api/hc
+      - HealthChecks-UI:HealthChecks:4:Name=Shopping Aggregator Health Check
+      - HealthChecks-UI:HealthChecks:4:Uri=http://shopping.aggregator/hc
+      - HealthChecks-UI:HealthChecks:5:Name=AspRunBasics WebMVC Health Check
+      - HealthChecks-UI:HealthChecks:5:Uri=http://aspnetrunbasics/hc
+
   elasticsearch:
    container_name: elasticsearch
    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
