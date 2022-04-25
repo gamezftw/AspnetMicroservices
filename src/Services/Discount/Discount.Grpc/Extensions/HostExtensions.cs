@@ -1,7 +1,7 @@
 using Npgsql;
 using Polly;
 
-namespace Discount.API.Extensions
+namespace Discount.Grpc.Extensions
 {
     public static class HostExtensions
     {
