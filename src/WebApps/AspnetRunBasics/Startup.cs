@@ -54,8 +54,8 @@ namespace AspnetRunBasics
 
             services.AddHealthChecks()
               .AddUrlGroup(
-                  new Uri($"{Configuration["ApiSettings:GatewayUrl"]}/hc"),
-                  "Catalog.API",
+                  new Uri($"{Configuration["ApiSettings:GatewayUrl"]}"), //TODO implement healthchecks on ocelot gateway
+                  "Gateway",
                   HealthStatus.Degraded);
         }
 
