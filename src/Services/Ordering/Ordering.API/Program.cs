@@ -7,6 +7,8 @@ using Ordering.Infrastructure;
 using Ordering.Infrastructure.Persistence;
 using Serilog;
 using Common.Logging;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +48,8 @@ builder.Services.AddMassTransit(config =>
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<BasketCheckoutConsumer>();
 
+builder.Services.AddHealthChecks()
+  .AddDbContextCheck<OrderContext>();
 
 var app = builder.Build();
 
@@ -69,5 +73,11 @@ app.MigrateDatabase<OrderContext>((context, services) =>
             .Wait();
     }
 );
+
+app.MapHealthChecks("/hc", new HealthCheckOptions()
+{
+    Predicate = _ => true,
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.Run();
