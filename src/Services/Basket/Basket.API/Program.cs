@@ -2,9 +2,11 @@ using Basket.API.GrpcServices;
 using Basket.API.Repositories;
 using Discount.Grpc.Protos;
 using MassTransit;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Common.Logging;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +47,19 @@ builder.Services.AddMassTransit(config =>
 // refactor it
 // builder.Services.AddMassTransitHostedService();
 
+builder.Services.AddHealthChecks()
+  .AddRedis(
+      builder.Configuration["CacheSettings:ConnectionString"],
+      "Baskset Redis Health",
+      HealthStatus.Degraded);
+  // .AddRabbitMQ(
+  //     builder.Configuration["CacheSettings:ConnectionString"],
+  //     new RabbitMQ.Client.SslOption() { Enabled = false },
+  //     "Baskset RabbitMQ Health",
+  //     HealthStatus.Degraded);
+  // .AddRabbitMQ(
+  //     rabbitConnectionString: builder.Configuration["EventBusSettings:HostAddress"]);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -59,5 +74,10 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/hc", new HealthCheckOptions()
+{
+    Predicate = _ => true,
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 app.Run();
