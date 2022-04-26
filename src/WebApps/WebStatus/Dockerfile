@@ -6,10 +6,10 @@ ENV ASPNETCORE_URLS=http://+:80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0-focal AS build
 WORKDIR /src
-COPY ["src/WebApps/WebStatus/WebStatus.csproj", "src/ApiGateways/OcelotApiGw/"]
+COPY ["src/WebApps/WebStatus/WebStatus.csproj", "src/WebApps/WebStatus/"]
 RUN dotnet restore "src/WebApps/WebStatus/WebStatus.csproj"
 COPY . .
-WORKDIR "/src//WebApps/WebStatus/WebStatus"
+WORKDIR "/src/src/WebApps/WebStatus"
 RUN dotnet build "WebStatus.csproj" -c Release -o /app/build
 
 FROM build AS publish
