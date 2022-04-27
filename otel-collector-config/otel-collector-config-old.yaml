@@ -21,8 +21,8 @@ exporters:
     format: proto
 
   # Export to a file
-  file:
-    path: /etc/output/logs.json
+  # file:
+  #   path: /etc/output/logs.json
 
 # Configure processors (batch, sampling, filtering, hashing sensitive data, etc.)
 # https://opentelemetry.io/docs/collector/configuration/#processors
@@ -44,7 +44,7 @@ service:
       receivers: [otlp]
       processors: [batch]
       exporters: [logging, prometheus]
-    logs:
-      receivers: [otlp]
-      processors: []
-      exporters: [logging, file]
+    # logs:
+    #   receivers: [otlp]
+    #   processors: []
+    #   exporters: [logging, file]
