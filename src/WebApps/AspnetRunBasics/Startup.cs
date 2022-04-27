@@ -10,6 +10,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Polly;
 using Polly.Extensions.Http;
 using Serilog;
@@ -28,6 +31,35 @@ namespace AspnetRunBasics
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Configure metrics
+            services.AddOpenTelemetryMetrics(otelBuilder =>
+            {
+                otelBuilder.AddHttpClientInstrumentation();
+                otelBuilder.AddAspNetCoreInstrumentation();
+                otelBuilder.AddMeter("MyApplicationMetrics");
+                otelBuilder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Configuration["OpenTelemetry:ResourceName"]));
+                otelBuilder.AddOtlpExporter(options => options.Endpoint = new Uri(Configuration["OpenTelemetry:CollectorUrl"]));
+            });
+
+            // Configure tracing
+            services.AddOpenTelemetryTracing(otelBuilder =>
+            {
+                otelBuilder.AddHttpClientInstrumentation();
+                otelBuilder.AddAspNetCoreInstrumentation();
+                otelBuilder.AddSource("MyApplicationActivitySource");
+                otelBuilder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(Configuration["OpenTelemetry:ResourceName"]));
+                otelBuilder.AddOtlpExporter(options => options.Endpoint = new Uri(Configuration["OpenTelemetry:CollectorUrl"]));
+            });
+
+            // TODO
+            // Configure logging
+            // builder.Logging.AddOpenTelemetry(otelBuilder =>
+            // {
+            //     otelBuilder.IncludeFormattedMessage = true;
+            //     otelBuilder.IncludeScopes = true;
+            //     otelBuilder.ParseStateValues = true;
+            //     otelBuilder.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(builder.Configuration["OpenTelemetry:ResourceName"]));
+            // });
 
             services.AddTransient<LoggingDelegatingHandler>();
 
